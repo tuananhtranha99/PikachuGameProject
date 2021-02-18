@@ -8,12 +8,15 @@ public class Controller {
 	private Random rand = new Random();
 	private int row ;
 	private int col ;
-	private int[][] matrix = new int[row][col]; // ma trận chứa giá trị số tương ứng với từng icon
+	private int[][] matrix; // ma trận chứa giá trị số tương ứng với từng icon
 	private ArrayList<Point> listPoint = new ArrayList<>(); // arraylist chứa vị trí của các Point
 	
 	public Controller(int row, int col) {
 		this.row = row;
 		this.col = col;
+		createMatrix();
+		
+	
 	}
 	/**
 	 * Tạo list các toạ độ cùa từng icon, kích thước = kích thước ma trận
@@ -32,6 +35,8 @@ public class Controller {
 	 * sau khi vị trí đã được gán giá trị thì vị trí đó sẽ được xoá khỏi listPoint để không lặp lại việc gán giá trị cho vị trí đó lần nữa
 	 */
 	public void createMatrix() {
+		createListPoint();
+		matrix = new int[row][col];
 		int imgCount = 21; // số lượng icon
 		int max = 4;
 		int []arr = new int[imgCount + 1]; // mảng để theo dõi các icon đã vượt quá 4 lần xuất hiện hay chưa, nếu chưa thì gán giá trị cho 2 vị trí
@@ -81,4 +86,6 @@ public class Controller {
 	public void setMatrix(int[][] matrix) {
 		this.matrix = matrix;
 	}
+	
+	
 }
