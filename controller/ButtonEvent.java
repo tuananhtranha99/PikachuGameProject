@@ -15,7 +15,7 @@ import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
 public class ButtonEvent extends JPanel implements ActionListener{
-	private JFrame frame;
+	private MainFrame frame;
 	private int row;
 	private int col;
 	private JButton[][] btn;
@@ -25,7 +25,7 @@ public class ButtonEvent extends JPanel implements ActionListener{
 	 * setup 1 số thứ cho GUI như số hàng, số cột, màu nền, sau đó gọi hàm newGame() để 
 	 * tạo ra giao diện trò chơi
 	 */
-	public ButtonEvent(JFrame frame,int row, int col) {
+	public ButtonEvent(MainFrame frame,int row, int col) {
 		this.frame = frame;
 		this.row = row;
 		this.col = col;
