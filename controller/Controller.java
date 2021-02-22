@@ -38,7 +38,7 @@ public class Controller {
 		createListPoint();
 		matrix = new int[row][col];
 		int imgCount = 21; // số lượng icon
-		int max = 4;
+		int max = 8;
 		int []arr = new int[imgCount + 1]; // mảng để theo dõi các icon đã vượt quá 4 lần xuất hiện hay chưa, nếu chưa thì gán giá trị cho 2 vị trí
 		for(int i = 0; i < (row*col)/2; i++) {
 			int index = rand.nextInt(imgCount) + 1; // giá trị số đại diện cho icon tương ứng
@@ -58,7 +58,7 @@ public class Controller {
 	 * Hiển thị ma trận icon
 	 */
 	public void showMatrix() {
-		Controller control = new Controller(8, 8);
+		Controller control = new Controller(row, col);
 		control.createListPoint();
 		control.createMatrix();
 		for(int i = 0; i < control.row; i++) {
@@ -85,6 +85,10 @@ public class Controller {
 	}
 	public void setMatrix(int[][] matrix) {
 		this.matrix = matrix;
+	}
+	public static void main(String[] args) {
+		Controller c = new Controller(9, 16);
+		c.showMatrix();
 	}
 	
 	
