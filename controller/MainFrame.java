@@ -3,10 +3,10 @@ package controller;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Font;
-import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import javax.swing.BorderFactory;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
@@ -15,6 +15,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
+import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
 
 public class MainFrame extends JFrame implements Runnable{
@@ -22,12 +23,13 @@ public class MainFrame extends JFrame implements Runnable{
 	private int col = 16;
 	private ButtonEvent graphicsPanel;
 	private JPanel mainPanel;
-	private final int MAX_TIME = 300;
+	private final int MAX_TIME = 20;
 	public double time = MAX_TIME; // biến time và lbScore cần để public nhằm truy cập từ các lớp khác
 	public JLabel lbScore;
 	private JProgressBar progressTime;
 	private JMenu menu;
-	private Thread t;
+	public boolean pause = false;
+	public boolean resume = false;
 	
 	
 	public MainFrame() {
@@ -40,6 +42,9 @@ public class MainFrame extends JFrame implements Runnable{
 				menuBar.add(menu);
 				this.setJMenuBar(menuBar);
 						
+				
+				
+				
 				mainPanel = createMainPanel();
 				this.getContentPane().add(mainPanel);
 				setTitle("Pikachu");
@@ -49,27 +54,33 @@ public class MainFrame extends JFrame implements Runnable{
 				setLocationRelativeTo(null); // chương trình khi chạy sẽ hiện ở giữa màn hình
 				setVisible(true);
 				
-				//tạo ra thread và cho thread chạy để cho thanh progressTime chạy
-				t = new Thread(this);
-				t.start();
+
 	}
 	
 	/**
-	 * hàm này tạo ra 1 panel chứa các icon 
+	 * tạo ra Panel chính, panel này sẽ chứa graphicsPanel(các icon) 
+	 * và chứa controlPanel(thanh thời gian và điểm)
 	 */
 	private JPanel createMainPanel() {
+		Border padding = BorderFactory.createLineBorder(Color.black, 50);
 		JPanel panel = new JPanel(new BorderLayout());
-		graphicsPanel = new ButtonEvent(this, row, col);
-		JPanel subPanel = new JPanel(new GridBagLayout());
-		subPanel.setBackground(Color.black);
-		subPanel.add(graphicsPanel);
-		panel.add(subPanel, BorderLayout.CENTER);
+		panel.setBorder(padding); // padding: 50px
+		panel.add(createGraphicsPanel(), BorderLayout.CENTER);
 		panel.add(createControlPanel(), BorderLayout.NORTH);
 		return panel;
 	}
 	
 	/**
-	 * tạo ra panel chứa score và progressTime
+	 * panel này chứa các icon và có background màu đen
+	 */
+	private JPanel createGraphicsPanel() {
+		graphicsPanel = new ButtonEvent(this, row, col);
+		graphicsPanel.setBackground(Color.black);
+		return graphicsPanel;
+	}
+	
+	/**
+	 * panel chứa score và thanh thời gian
 	 * @return
 	 */
 	private JPanel createControlPanel() {
@@ -77,7 +88,7 @@ public class MainFrame extends JFrame implements Runnable{
 		// lbScore là 1 JLabel với giá trị ban đầu là 0
 		lbScore = new JLabel("0");
 		lbScore.setForeground(Color.white); // cài màu text cho label
-		lbScore.setFont(new Font(lbScore.getFont().getName(), Font.PLAIN, 30)); // thay đổi font size cho label
+		lbScore.setFont(new Font("serif", Font.BOLD, 30)); // thay đổi font size cho label
 		progressTime = new JProgressBar(0, 100);
 		progressTime.setValue(100);
 		
@@ -86,9 +97,14 @@ public class MainFrame extends JFrame implements Runnable{
 		
 		JPanel subPanel = new JPanel(new BorderLayout(70, 0));
 		subPanel.setBackground(Color.black);
-		subPanel.setBorder(new EmptyBorder(50,100,5,50)); // giống như padding top, left, bottom, right
+		subPanel.setBorder(new EmptyBorder(0,100,5,50)); // giống như padding top, left, bottom, right
 		subPanel.add(lbScore, BorderLayout.EAST);
 		subPanel.add(progressTime, BorderLayout.CENTER);
+		
+		// padding: 30px
+		Border padding = BorderFactory.createLineBorder(Color.black, 30);
+		subPanel.setBorder(padding);
+		
 		
 		return subPanel;
 	}
@@ -98,32 +114,33 @@ public class MainFrame extends JFrame implements Runnable{
 	 * vẫn chưa ra đâu vào đâu
 	 */
 	public void newGame() {
-		graphicsPanel.removeAll();
-		mainPanel = createMainPanel();
-		add(mainPanel);
-		lbScore.setText("1"); // tại sao chỗ score phải set text khác thì đống icon mới thay đổi ????
-		t.interrupt();
-		time = MAX_TIME;
-		progressTime.setValue(100);
-		
-		t = new Thread();
-		t.start();
-
-		
+		graphicsPanel.removeAll(); // xoá hết icon hiện tại
+		mainPanel.add(createGraphicsPanel()); // tạo ra các icon mới và add vào mainPanel
+		mainPanel.validate(); // cập nhật cửa sổ giao diện
+//		mainPanel.setVisible(true); // dòng này có tác dụng gì đây? không có thì vẫn hiển thị các icon mới mà
+		lbScore.setText("0"); 
+		time = MAX_TIME;	
 	}
 	
 	/**
 	 * sử dụng JOptionPane.YES_NO_OPTION để hiển thị ra hộp thoại message với 2 lựa chọn yes và no
+	 * khi hộp thoại bật lên thì thời gian sẽ dừng lại, chọn yes thì màn mới hiện ra và thời gian bắt đầu 
+	 * đếm, chọn no thì thời gian tiếp tục đếm bình thường
 	 * @param message: thông báo sẽ hiển thị trên hộp thoại
 	 * @param title: tiêu đề hộp thoại
-	 * @param t: t = 1 nếu win hoặc lose, t = 0 nếu đang chơi dở mà bấm vào nút new game
 	 */
 	public void showDialogueNewGame(String message, String title) {
+		pause = true; 
+		resume = false;
 		int select = JOptionPane.showOptionDialog(null, message, title, JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, null);
 		if(select == 0) {
+			pause = false;
 			newGame();
-		} 
-	}
+		} else {
+			resume = true;
+			}
+		}
+	
 	
 	/**
 	 * cứ sau 1 giây thì giảm giá trị biến time đi 1 và cập nhật lại phần trăm của 
@@ -135,11 +152,9 @@ public class MainFrame extends JFrame implements Runnable{
 		try {
 			Thread.sleep(1000);
 		} catch (InterruptedException e) {
-			// khi gọi hàm interrupt() của thread thì exception này sẽ xảy ra
-			// tạm thời bỏ qua exception này ko xử lí vì chưa hiểu
+			e.printStackTrace();
 		}
-		int percent = (int) ((double) --time / MAX_TIME * 100);
-		progressTime.setValue(percent);
+		progressTime.setValue((int) ((double) time / MAX_TIME * 100));
 		}
 		
 	}
@@ -152,15 +167,10 @@ public class MainFrame extends JFrame implements Runnable{
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			showDialogueNewGame("Your game hasn't done. Do you want to create a new game?", "Warning");
-			
+			showDialogueNewGame("Your game hasn't done. Do you want to create a new game?", "Warning");	
 		}
 		
 	}
 	
-	public static void main(String[] args) {
-		MainFrame frame = new MainFrame();
-
-	}
 	
 }
