@@ -3,6 +3,7 @@ package controller;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -19,11 +20,11 @@ import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
 
 public class MainFrame extends JFrame implements Runnable{
-	private int row = 9;
-	private int col = 16;
+	private int row = 16;
+	private int col = 9;
 	private ButtonEvent graphicsPanel;
 	private JPanel mainPanel;
-	private final int MAX_TIME = 20;
+	private final int MAX_TIME = 300;
 	public double time = MAX_TIME; // biến time và lbScore cần để public nhằm truy cập từ các lớp khác
 	public JLabel lbScore;
 	private JProgressBar progressTime;
@@ -76,6 +77,7 @@ public class MainFrame extends JFrame implements Runnable{
 	private JPanel createGraphicsPanel() {
 		graphicsPanel = new ButtonEvent(this, row, col);
 		graphicsPanel.setBackground(Color.black);
+
 		return graphicsPanel;
 	}
 	
