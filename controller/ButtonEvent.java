@@ -2,6 +2,8 @@ package controller;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.Point;
@@ -19,7 +21,7 @@ public class ButtonEvent extends JPanel implements ActionListener{
 	private Point p1;
 	private Point p2;
 	private PointLine line;
-	private int score = 0;
+	private int score ;
 	private int item; // tổng số cặp icon
 	private MainFrame frame;
 	private int row;
@@ -37,9 +39,9 @@ public class ButtonEvent extends JPanel implements ActionListener{
 		this.col = col;
 		item = row * col / 2;
 		
-		setLayout(new GridLayout(row, col, 2, 2)); // set layout for JPanel as a table
-		setBackground(Color.BLACK); // set background color
-		setBorder(new EmptyBorder(10, 10, 10, 10));
+		setLayout(new GridLayout(row, col)); // set layout for JPanel as a table
+//		setBackground(Color.white); // set background color
+//		setBorder(new EmptyBorder(10, 10, 10, 10));
 		
 		newGame();
 		
@@ -53,7 +55,7 @@ public class ButtonEvent extends JPanel implements ActionListener{
 		int y = Integer.parseInt(indexDot[1]);
 		if(p1 == null) {
 			p1 = new Point(x, y);
-			btn[p1.x][p1.y].setBorder(new LineBorder(Color.RED));
+			btn[x][y].setBorder(new LineBorder(Color.red, 1));
 		} else {
 			p2 = new Point(x,y);
 			line = controller.checkTwoPoint(p1, p2);
@@ -71,6 +73,14 @@ public class ButtonEvent extends JPanel implements ActionListener{
 			btn[p1.x][p1.y].setBorder(null);
 			p1 = null;
 			p2 = null;
+			if(item == 0) {
+				// nếu thắng màn chơi thì sẽ chuyển sang màn tiếp theo
+				// score tiếp tục được lưu chứ ko bị reset
+				int tmpScore = score;
+				frame.newGame();
+				frame.getGraphicsPanel().setScore(tmpScore);
+				System.out.println("Win");
+			}
 		}
 		
 		
@@ -81,7 +91,7 @@ public class ButtonEvent extends JPanel implements ActionListener{
 	 */
 	public Icon getIcon(int index) {
 		Image image = new ImageIcon(getClass().getResource("/icon/" + index + ".png")).getImage();
-		Icon icon = new ImageIcon(image.getScaledInstance(50, 50, image.SCALE_SMOOTH)); // icon có thể resize
+		Icon icon = new ImageIcon(image.getScaledInstance(40, 40, image.SCALE_SMOOTH)); // icon có thể resize
 		return icon;
 	}
 	
@@ -106,6 +116,7 @@ public class ButtonEvent extends JPanel implements ActionListener{
 				btn[i][j] = createButton(i + "," +j); // mỗi nút tự lưu toạ độ của chính nó, đã giải thích ở hàm createButton
 				Icon icon = getIcon(controller.getMatrix()[i][j]);
 				btn[i][j].setIcon(icon);
+				btn[i][j].setBorder(new LineBorder(Color.black));
 				add(btn[i][j]);
 			}
 		}
@@ -121,7 +132,7 @@ public class ButtonEvent extends JPanel implements ActionListener{
 		// ở đây ta sử dụng hàm setActionCommand() để mỗi button tự lưu toạ độ của chính nó
 		// và toạ độ này sẽ được lấy ra ở hàm actionPerformed() - lúc button được click
 		btn.setActionCommand(action); 
-		btn.setBorder(new LineBorder(Color.BLACK));
+		btn.setBorder(null);
 		btn.addActionListener(this);
 		return btn;
 	}
@@ -135,6 +146,10 @@ public class ButtonEvent extends JPanel implements ActionListener{
 		btn.setIcon(null);
 		btn.setBackground(Color.black);
 		btn.setEnabled(false);
+	}
+ 
+	public void setScore(int score) {
+		this.score = score;
 	}
 
 }
