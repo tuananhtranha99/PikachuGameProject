@@ -22,8 +22,8 @@ import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
 
 public class MainFrame extends JFrame implements Runnable{
-	private int row = 12;
-	private int col = 12;
+	private int row = 4;
+	private int col = 4;
 	private ButtonEvent graphicsPanel;
 	private JPanel mainPanel;
 	private final int MAX_TIME = 300;

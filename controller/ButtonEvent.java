@@ -35,13 +35,11 @@ public class ButtonEvent extends JPanel implements ActionListener{
 	 */
 	public ButtonEvent(MainFrame frame,int row, int col) {
 		this.frame = frame;
-		this.row = row;
-		this.col = col;
+		this.row = row +2;
+		this.col = col +2;
 		item = row * col / 2;
 		
 		setLayout(new GridLayout(row, col)); // set layout for JPanel as a table
-//		setBackground(Color.white); // set background color
-//		setBorder(new EmptyBorder(10, 10, 10, 10));
 		
 		newGame();
 		
@@ -100,7 +98,7 @@ public class ButtonEvent extends JPanel implements ActionListener{
 	 * sau đó gọi hàm addArrayButton() để chuyển các index thành các button với các icon tương ứng 
 	 */
 	public void newGame() {
-		controller = new Controller(row, col);
+		controller = new Controller(row-2, col-2);
 		addArrayButton();
 		
 	}
@@ -111,8 +109,8 @@ public class ButtonEvent extends JPanel implements ActionListener{
 	 */
 	public void addArrayButton() {
 		btn = new JButton[row][col];
-		for(int i = 0; i < row; i++) {
-			for(int j = 0; j < col; j++) {
+		for(int i = 1; i < row-1; i++) {
+			for(int j = 1; j < col-1; j++) {
 				btn[i][j] = createButton(i + "," +j); // mỗi nút tự lưu toạ độ của chính nó, đã giải thích ở hàm createButton
 				Icon icon = getIcon(controller.getMatrix()[i][j]);
 				btn[i][j].setIcon(icon);
