@@ -4,8 +4,6 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.Font;
-import java.awt.GridBagLayout;
-import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -19,11 +17,10 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.border.Border;
-import javax.swing.border.EmptyBorder;
 
 public class MainFrame extends JFrame implements Runnable{
-	private int row = 4;
-	private int col = 4;
+	private int row = 12;
+	private int col = 12;
 	private ButtonEvent graphicsPanel;
 	private JPanel mainPanel;
 	private final int MAX_TIME = 300;
@@ -56,6 +53,12 @@ public class MainFrame extends JFrame implements Runnable{
 				setSize(650, 700);
 				setLocationRelativeTo(null); // chương trình khi chạy sẽ hiện ở giữa màn hình
 				setVisible(true);
+				try {
+					Music.playMusic();
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 				
 
 	}

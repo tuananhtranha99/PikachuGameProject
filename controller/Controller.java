@@ -76,7 +76,49 @@ public class Controller {
 	
 	public PointLine checkTwoPoint(Point p1, Point p2) {
 		if(!p1.equals(p2) && matrix[p1.x][p1.y] == matrix[p2.x][p2.y]) {
-			return new PointLine(p1, p2);
+			
+			// 2 item nằm cùng 1 hàng
+			if(p1.x == p2.x) {
+				if(checkLineX(p1.y, p2.y, p1.x)) {
+					return new PointLine(p1, p2);
+				}
+			}
+			 // 2 item nằm cùng 1 cột
+			if(p1.y == p2.y) {
+				if(checkLineY(p1.x, p2.x, p1.y)) {
+					return new PointLine(p1, p2);
+				}
+			}
+			
+			// đường nối 2 item nằm trong hình chữ nhật check theo chiều ngang
+			if(checkRectX(p1, p2)) {
+				return new PointLine(p1, p2);
+			}
+			
+			// đường nối 2 item nằm trong hình chữ nhật check theo chiều dọc
+			if(checkRectY(p1, p2)) {
+				return new PointLine(p1, p2);
+			}
+			
+			// đường nối 2 item vượt ra ngoài bên phải 
+			if(checkMoreLineX(p1, p2, 1)) {
+				return new PointLine(p1, p2);
+			}
+			
+			// // đường nối 2 item vượt ra ngoài bên trái 
+			if(checkMoreLineX(p1, p2, -1)) {
+				return new PointLine(p1, p2);
+			}
+			
+			// // đường nối 2 item vượt ra ngoài bên dưới 
+			if(checkMoreLineY(p1, p2, 1)) {
+				return new PointLine(p1, p2);
+			}
+			
+			// // đường nối 2 item vượt ra ngoài bên trên 
+			if(checkMoreLineY(p1, p2, -1)) {
+				return new PointLine(p1, p2);
+			}
 		}
 		return null;
 	}
@@ -124,6 +166,13 @@ public class Controller {
 	}
 	
 	
+	/**
+	 * Đây là trường hợp 2 item được nối với nhau theo chiều ngang
+	 * bằng tối đa 3 đường trong phạm vi hình chữ nhật 
+	 * @param p1: điểm có y nhỏ hơn (điểm nằm bên trái)
+	 * @param p2: điểm có y lớn hơn (điểm nằm bên phải)
+	 * @return true nếu 3 đường đều thoả mãn không bị chặn
+	 */
 	private boolean checkRectX(Point p1, Point p2) {
 		System.out.println("check rect x");
 		
@@ -133,10 +182,13 @@ public class Controller {
 			pMaxY = p1;
 		}
 		for(int y = pMinY.y; y <= pMaxY.y; y++) {
+			
+			// kiểm tra đoạn đầu tiên (đoạn ngang) có bị chặn không
 			if(y > pMinY.y && matrix[pMinY.x][y] != 0) {
 				return false;
 			}
 			
+			// kiểm tra đoạn thứ 2 (đoạn dọc) và đoạn thứ 3 (đoạn ngang) có bị chặn không
 			if(matrix[pMaxY.x][y] == 0 
 				&& checkLineY(pMinY.x, pMaxY.x, y)
 				&& checkLineX(y, pMaxY.y, pMaxY.x)) {
@@ -149,6 +201,131 @@ public class Controller {
 		}
 		return false;
 	}
+	
+	/**
+	 * Đây là trường hợp 2 item được nối với nhau theo chiều dọc
+	 * bằng tối đa 3 đường trong phạm vi hình chữ nhật 
+	 * @param p1: điểm có x nhỏ hơn (điểm nằm bên trên)
+	 * @param p2: điểm có x lớn hơn (điểm nằm bên dưới)
+	 * @return true nếu 3 đường đều thoả mãn không bị chặn
+	 */
+	private boolean checkRectY(Point p1, Point p2) {
+		System.out.println("check rect y");
+		
+		Point pMinX = p1, pMaxX = p2;
+		if(p1.x > p2.x) {
+			pMinX = p2;
+			pMaxX = p1;
+		}
+		for(int x = pMinX.x; x <= pMaxX.x; x++) {
+			
+			// kiểm tra đoạn đầu tiên (đoạn dọc) có bị chặn không
+			if(x > pMinX.x && matrix[x][pMinX.y] != 0) {
+				return false;
+			}
+			
+			// kiểm tra đoạn thứ 2 (đoạn ngang) và đoạn thứ 3 (đoạn dọc) có bị chặn không
+			if(matrix[x][pMaxX.y] == 0 
+					&& checkLineX(pMinX.y, pMaxX.y, x) 
+					&& checkLineY(x, pMaxX.x, pMaxX.y)) {
+				
+				System.out.println("Rect y");
+                System.out.println("(" + pMinX.x + "," + pMinX.y + ") -> (" + x
+                        + "," + pMinX.y + ") -> (" + x + "," + pMaxX.y
+                        + ") -> (" + pMaxX.x + "," + pMaxX.y + ")");
+                return true;
+			} 
+		}
+		return false;
+	}
+	
+	/**
+	 * Đầu tiên phải check xem đoạn nối từ p1 đến điểm nằm ở góc trên bên phải của hình chữ nhật có bị chặn không
+	 * nếu đoạn ấy không bị chặn thì tiếp tục kiểm tra xem đường nối bên ngoài hình chữ nhật(đoạn thứ 2 - nằm dọc) và đoạn thứ 3(nằm ngang) 
+	 * có bị chặn không 
+	 * @param p1: điểm nằm bên trái	
+	 * @param p2: điểm nằm bên phải
+	 * @param type: xác định đường nối vượt ra ngoài bên phải hay ngoài bên trái
+	 * @return true nếu không đoạn nào bị chặn
+	 */
+	private boolean checkMoreLineX(Point p1, Point p2, int type) {
+		System.out.println("check more x");
+		
+		Point pMinY = p1, pMaxY = p2;
+		if(p1.y > p2.y) {
+			pMinY = p2;
+			pMaxY = p1;
+		}
+		
+		int y = pMaxY.y + type;
+		int row = pMinY.x;
+		int colFinish = pMaxY.y;
+		if(type == -1) {
+			colFinish = pMinY.y;
+			y = pMinY.y + type;
+			row = pMaxY.x;
+			System.out.println("colFinish = " + colFinish);
+		}
+		
+		if((matrix[row][colFinish] == 0 || pMinY.y == pMaxY.y)
+				&& checkLineX(pMinY.y, pMaxY.y, row)) {
+			while(matrix[pMinY.x][y] == 0 
+					&& matrix[pMaxY.x][y] == 0) {
+				if(checkLineY(pMinY.x, pMaxY.x, y)) {
+					System.out.println("TH X " + type);
+                    System.out.println("(" + pMinY.x + "," + pMinY.y + ") -> ("
+                            + pMinY.x + "," + y + ") -> (" + pMaxY.x + "," + y
+                            + ") -> (" + pMaxY.x + "," + pMaxY.y + ")");
+				return true;
+				}
+				y += type;
+			}
+		}
+		return false;
+	}
+	
+	/**
+	 * Đầu tiên phải check xem đoạn nối từ p1 đến điểm nằm ở góc dưới bên trái của hình chữ nhật có bị chặn không
+	 * nếu đoạn ấy không bị chặn thì tiếp tục kiểm tra xem đường nối bên ngoài hình chữ nhật(đoạn thứ 2 - nằm ngang) và đoạn thứ 3(nằm dọc) 
+	 * có bị chặn không 
+	 * @param p1: điểm nằm bên trái	
+	 * @param p2: điểm nằm bên phải
+	 * @param type: xác định đường nối vượt ra ngoài bên phải hay ngoài bên trái
+	 * @return true nếu không đoạn nào bị chặn
+	 */
+	private boolean checkMoreLineY(Point p1, Point p2, int type) {
+		System.out.println("check more y");
+		Point pMinX = p1, pMaxX = p2;
+		if(p1.x > p2.x) {
+			pMinX = p2;
+			pMaxX = p1;
+		}
+		int x = pMaxX.x + type;
+		int col = pMinX.y;
+		int rowFinish = pMaxX.x;
+		if(type == -1) {
+			x = pMinX.x + type;
+			rowFinish = pMinX.x;
+			col = pMaxX.y;
+		}
+		if((matrix[rowFinish][col] == 0 ) || pMinX.x == pMaxX.x
+				&& checkLineY(pMinX.x, pMaxX.x, col)) {
+			while(matrix[x][pMinX.y] == 0 
+					&& matrix[x][pMaxX.y] == 0) {
+				if(checkLineX(pMinX.y, pMaxX.y, x)) {
+					System.out.println("TH Y " + type);
+                    System.out.println("(" + pMinX.x + "," + pMinX.y + ") -> ("
+                            + x + "," + pMinX.y + ") -> (" + x + "," + pMaxX.y
+                            + ") -> (" + pMaxX.x + "," + pMaxX.y + ")");
+					return true;
+				}
+				x += type;
+			}
+				
+			}
+		return false;
+		}
+	
 	
 	
 	public int getRow() {
